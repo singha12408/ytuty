@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คำนวณตามสูตร R1, R2, R3, R4</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7fa; /* เปลี่ยนพื้นหลังเป็นสีฟ้าอ่อน */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #00796b; /* เปลี่ยนสีหัวเรื่อง */
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #00796b; /* เปลี่ยนสีกรอบ input */
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            border-color: #004d40; /* เปลี่ยนสีกรอบเมื่อโฟกัส */
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        button {
+            background-color: #00796b;
+            color: white;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #004d40; /* เปลี่ยนสีปุ่มเมื่อเลื่อนเมาส์ */
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: #333;
+            opacity: 0;
+            transform: translateY(-50px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .modal-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .close {
+            color: #333;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #777;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #00796b; /* เปลี่ยนสีหัวเรื่องใน modal */
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>USDT ທີ່ອອກ</h1>
+        
+        <input type="number" id="n" placeholder="ໃສ່ຈຳນວນUSDT" step="any" required>
+        <input type="number" id="percent" placeholder="ໃສ່ເປີເຊັນ" step="any" required>
+        <button id="processButton" onclick="calculate()">ຕໍ່ໄປ</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content" id="modalContent">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>ສຳເລັດ!</h2>
+            <p id="modalResult"></p> <!-- ผลลัพธ์ที่แสดง -->
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const button = document.getElementById("processButton");
+            button.innerHTML = "ກຳລັງປະມວນຜົນ...";
+            button.disabled = true; // ปิดการใช้งานปุ่มระหว่างการประมวลผล
+
+            setTimeout(() => {
+                let n = parseFloat(document.getElementById("n").value);
+                let percentage = parseFloat(document.getElementById("percent").value);
+
+                if (isNaN(n) || n <= 0 || isNaN(percentage) || percentage <= 0) {
+                    alert("กรุณากรอกค่าที่ถูกต้อง");
+                    button.innerHTML = "ประมวลผล"; // เปลี่ยนกลับเป็นข้อความเดิม
+                    button.disabled = false; // เปิดใช้งานปุ่ม
+                    return;
+                }
+
+                // คำนวณตามสูตรที่ให้มา
+                let R1 = (n / 100) / 0.95;
+                let R2 = R1 / 0.95;
+                let R3 = (R1 + R2) / 0.95;
+                let R4 = (R1 + R2 + R3) / 0.95;
+
+                // คำนวณเปอร์เซ็นต์จากจำนวนคนและเปอร์เซ็นต์ที่กรอก
+                let total = Math.round((percentage * n) / 100); // คำนวณผลลัพธ์และปัดเศษเป็นจำนวนเต็ม
+
+                // แสดงผลลัพธ์ใน modal
+                document.getElementById("modalResult").innerHTML = 
+                    "R1 = " + R1.toFixed(4) + " USDT<br>" + 
+                    "R2 = " + R2.toFixed(4) + " USDT<br>" + 
+                    "R3 = " + R3.toFixed(4) + " USDT<br>" + 
+                    "R4 = " + R4.toFixed(4) + " USDT<br>" + 
+                    "ເປີເຊັນ = " + total + " %"; // แสดงเปอร์เซ็นต์
+                
+                // แสดง modal พร้อมเอฟเฟกต์
+                const modalContent = document.getElementById("modalContent");
+                modalContent.classList.add('visible');
+                document.getElementById("myModal").style.display = "flex";
+
+                button.innerHTML = "ประมวลผล"; // เปลี่ยนกลับเป็นข้อความเดิม
+                button.disabled = false; // เปิดใช้งานปุ่ม
+                
+            }, 2000); // ตั้งเวลาเป็น 2 วินาที
+        }
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none"; // ปิด modal
+            const modalContent = document.getElementById("modalContent");
+            modalContent.classList.remove('visible'); // ลบเอฟเฟกต์
+        }
+    </script>
+
+</body>
+</html>
